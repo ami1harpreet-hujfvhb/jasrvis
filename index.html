@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jarvis AI</title>
+  <style>
+    body {
+      background: black;
+      color: cyan;
+      font-family: Arial;
+      text-align: center;
+      padding-top: 40px;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      background: cyan;
+      border: none;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🧠 JARVIS AI</h1>
+<p>Click and Speak</p>
+
+<button onclick="startListening()">🎤 Speak</button>
+<div id="output"></div>
+
+<script>
+const API_KEY = "AIzaSyDkXx1234abcdEFG56789";const SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+const recognition = new SpeechRecognition();
+recognition.lang = "en-US";
+
+function speak(text) {
+  const msg = new SpeechSynthesisUtterance(text);
+  msg.rate = 1;
+  speechSynthesis.speak(msg);
+}
+
+function startListening() {
+  recognition.start();
+}
+
+recognition.onresult = async function(event) {
+  const command = event.results[0][0].transcript.toLowerCase();
+  document.getElementById("output").innerHTML = "You said: " + command;
+
+  // OPEN WEBSITE COMMANDS
+  if (command.includes("open google")) {
+    speak("Opening Google");
+    window.open("https://google.com", "_blank");
+    return;
+  }
+
+  if (command.includes("open youtube")) {
+    speak("Opening YouTube");
+    window.open("https://youtube.com", "_blank");
+    return;
+  }
+
+  // AI ANSWER
+  speak("Thinking...");
+  const response = await getAIResponse(command);
+  document.getElementById("output").innerHTML += "<br><br>Jarvis: " + response;
+  speak(response);
+};
+
+async function getAIResponse(text) {
+  const url =
+    "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" +
+
+
+
+  const body = {
+    contents: [{ parts: [{ text: text }] }]
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+
+  const data = await res.json();
+  return data.candidates[0].content.parts[0].text;
+}
+</script>
+
+</body>
+</html>
